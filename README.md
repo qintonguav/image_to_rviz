@@ -8,10 +8,10 @@
 ```
 rosrun image_to_rviz image_to_rviz_node
 ```
-![]()
+![Alt text](https://github.com/qintony/image_to_rviz/blob/master/img/img1.png)
 1.3 dynamiclly adjust the position of the image.
       scale, x, y, z and yaw angle 
 ```
 rosrun rqt_reconfigure rqt_reconfigure
 ```
-![]()
+![Alt text](https://github.com/qintony/image_to_rviz/blob/master/img/img2.png)
