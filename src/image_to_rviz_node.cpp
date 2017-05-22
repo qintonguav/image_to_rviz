@@ -42,7 +42,7 @@ int main( int argc, char** argv )
 
       cv::Mat src;
       std::string packagePath = ros::package::getPath("image_to_rviz");
-      src = cv::imread(packagePath + "/img/hkust.png", 1 );
+      src = cv::imread(packagePath + "/img/sea_front.png", 1 );
       
 
       visualization_msgs::Marker image;
