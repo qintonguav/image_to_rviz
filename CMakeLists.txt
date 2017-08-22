@@ -31,3 +31,7 @@ catkin_package()
 add_executable(image_to_rviz_node src/image_to_rviz_node.cpp)
 add_dependencies(image_to_rviz_node ${PROJECT_NAME}_gencfg)
 target_link_libraries(image_to_rviz_node ${catkin_LIBRARIES} ${OpenCV_LIBS})
+
+add_executable(vins_image_to_rviz src/vins_image_to_rviz.cpp)
+add_dependencies(vins_image_to_rviz ${PROJECT_NAME}_gencfg)
+target_link_libraries(vins_image_to_rviz ${catkin_LIBRARIES} ${OpenCV_LIBS})

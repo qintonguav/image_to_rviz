@@ -2,8 +2,9 @@
 #include <visualization_msgs/Marker.h>
 #include <cv.h>
 #include <ros/package.h>
-#include <highgui.h>
-#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/core/core.hpp>
+#include <opencv/cv.hpp>
 #include <dynamic_reconfigure/server.h>
 #include <image_to_rviz/paramsConfig.h>
 
@@ -43,6 +44,7 @@ int main( int argc, char** argv )
       cv::Mat src;
       std::string packagePath = ros::package::getPath("image_to_rviz");
       src = cv::imread(packagePath + "/img/sea_front.png", 1 );
+      cv::resize(src, src, cv::Size(80, 60));
       
 
       visualization_msgs::Marker image;
@@ -59,7 +61,7 @@ int main( int argc, char** argv )
       lu_x = 0;
       lu_y = 0;
       yaw = -3.14;
-      sizeSq = 100;
+      sizeSq = 1;
       z = -10;
 
       double pix;
@@ -84,6 +86,61 @@ int main( int argc, char** argv )
                         crgb.a = 1.0;
 
                         p.z = z;
+                        double x, y;
+                        x = (r - center_x);
+                        y = (c - center_y);
+                        p.x = lu_x + (x * cos(yaw) - y * sin(yaw)) * pix;
+                        p.y = lu_y + (x * sin(yaw) + y * cos(yaw)) * pix;
+                        image.points.push_back(p);
+                        image.colors.push_back(crgb);
+                        
+                        x = (r - center_x) + 1;
+                        y = (c - center_y);
+                        p.x = lu_x + (x * cos(yaw) - y * sin(yaw)) * pix;
+                        p.y = lu_y + (x * sin(yaw) + y * cos(yaw)) * pix;
+                        image.points.push_back(p);
+                        image.colors.push_back(crgb);
+
+                        x = (r - center_x);
+                        y = (c - center_y) + 1;
+                        p.x = lu_x + (x * cos(yaw) - y * sin(yaw)) * pix;
+                        p.y = lu_y + (x * sin(yaw) + y * cos(yaw)) * pix;
+                        image.points.push_back(p);
+                        image.colors.push_back(crgb);
+
+                        x = (r - center_x) + 1;
+                        y = (c - center_y);
+                        p.x = lu_x + (x * cos(yaw) - y * sin(yaw)) * pix;
+                        p.y = lu_y + (x * sin(yaw) + y * cos(yaw)) * pix;
+                        image.points.push_back(p);
+                        image.colors.push_back(crgb);
+
+                        x = (r - center_x) + 1;
+                        y = (c - center_y) + 1;
+                        p.x = lu_x + (x * cos(yaw) - y * sin(yaw)) * pix;
+                        p.y = lu_y + (x * sin(yaw) + y * cos(yaw)) * pix;
+                        image.points.push_back(p);
+                        image.colors.push_back(crgb);
+
+                        x = (r - center_x);
+                        y = ((c - center_y) + 1);
+                        p.x = lu_x + (x * cos(yaw) - y * sin(yaw)) * pix;
+                        p.y = lu_y + (x * sin(yaw) + y * cos(yaw)) * pix;
+                        image.points.push_back(p);
+                        image.colors.push_back(crgb);
+                        
+                      }
+                  }
+
+                  for(int r = 0; r < src.rows; ++r) {
+                      for(int c = 0; c < src.cols; ++c) {
+                        cv::Vec3b intensity = src.at<cv::Vec3b>(r, c);
+                        crgb.r = intensity.val[2] / 255.0;
+                        crgb.g = intensity.val[1] / 255.0;
+                        crgb.b = intensity.val[0] / 255.0;
+                        crgb.a = 1.0;
+
+                        p.z = z + 10;
                         double x, y;
                         x = (r - center_x);
                         y = (c - center_y);
