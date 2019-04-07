@@ -35,3 +35,7 @@ target_link_libraries(image_to_rviz_node ${catkin_LIBRARIES} ${OpenCV_LIBS})
 add_executable(vins_image_to_rviz src/vins_image_to_rviz.cpp)
 add_dependencies(vins_image_to_rviz ${PROJECT_NAME}_gencfg)
 target_link_libraries(vins_image_to_rviz ${catkin_LIBRARIES} ${OpenCV_LIBS})
+
+add_executable(vins_fusion_outdoor_img src/vins_fusion_outdoor_img.cpp)
+add_dependencies(vins_fusion_outdoor_img ${PROJECT_NAME}_gencfg)
+target_link_libraries(vins_fusion_outdoor_img ${catkin_LIBRARIES} ${OpenCV_LIBS})

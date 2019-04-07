@@ -43,8 +43,8 @@ int main( int argc, char** argv )
 
       cv::Mat src;
       std::string packagePath = ros::package::getPath("image_to_rviz");
-      src = cv::imread(packagePath + "/img/cyt.png", 1 );
-      //cv::resize(src, src, cv::Size(src.cols / 4, src.rows / 4));
+      src = cv::imread(packagePath + "/img/map.png", 1 );
+      cv::resize(src, src, cv::Size(src.cols / 4, src.rows / 4));
 
       visualization_msgs::Marker image;
       image.header.frame_id = "/world";
