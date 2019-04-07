@@ -7,11 +7,17 @@
 #include <opencv/cv.hpp>
 #include <dynamic_reconfigure/server.h>
 #include <image_to_rviz/paramsConfig.h>
+#include <fstream>
+#include <vector>
+#include <nav_msgs/Path.h>
+#include <nav_msgs/Odometry.h>
+#include <geometry_msgs/PointStamped.h>
 
 double lu_x = 0, lu_y = 0;
 double yaw = -3.14;
 double sizeSq = 1;
 double z = -10;
+
 
 void callback(image_to_rviz::paramsConfig &config, uint32_t level) {
   ROS_INFO("Reconfigure Request: %lf %lf %lf %lf %lf", 
@@ -34,6 +40,10 @@ int main( int argc, char** argv )
       ros::NodeHandle n("~");
       ros::Rate r(2);
       ros::Publisher marker_pub = n.advertise<visualization_msgs::Marker>("visualization_marker", 1);
+      ros::Publisher pub_path1 = n.advertise<nav_msgs::Path>("path1", 1000);
+      ros::Publisher pub_path2 = n.advertise<nav_msgs::Path>("path2", 1000);
+      ros::Publisher pub_path3 = n.advertise<nav_msgs::Path>("path3", 1000);
+      nav_msgs::Path path1, path2, path3;
 
       dynamic_reconfigure::Server<image_to_rviz::paramsConfig> server;
       dynamic_reconfigure::Server<image_to_rviz::paramsConfig>::CallbackType f;
@@ -44,7 +54,7 @@ int main( int argc, char** argv )
       cv::Mat src;
       std::string packagePath = ros::package::getPath("image_to_rviz");
       src = cv::imread(packagePath + "/img/map.png", 1 );
-      cv::resize(src, src, cv::Size(src.cols / 4, src.rows / 4));
+      //cv::resize(src, src, cv::Size(src.cols / 4, src.rows / 4));
 
       visualization_msgs::Marker image;
       image.header.frame_id = "/world";
@@ -63,6 +73,80 @@ int main( int argc, char** argv )
 
       double center_x = src.rows / 2.0;
       double center_y = src.cols / 2.0;
+
+
+      // pub trajectory
+      {
+            std::string dataPath = packagePath + "/data/vio_loop.csv";
+                  // load image list
+            FILE* file;
+            file = std::fopen(dataPath.c_str() , "r");
+            if(file == NULL){
+                printf("cannot find file \n");
+                ROS_BREAK();
+                return 0;          
+            }
+            std::vector<double> poseX;
+            std::vector<double> poseY;
+            std::vector<double> poseZ;
+            double tmp;
+            double x, y, z;
+            while (fscanf(file, "%lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf,", 
+                  &tmp, &x, &y, &z, &tmp, &tmp, &tmp, &tmp) != EOF)
+            {
+                  printf("x: %lf, y:%lf, z:%lf \n", x, y, z);
+                  poseX.push_back(x);
+                  poseY.push_back(y);
+                  poseZ.push_back(z);
+            }
+            std::fclose(file);
+
+
+            for(int i = 0; i < 2850; i++)
+            {
+
+                  geometry_msgs::PoseStamped pose_stamped;
+                  pose_stamped.header.stamp = ros::Time::now();
+                  pose_stamped.header.frame_id = "world";
+                  pose_stamped.pose.position.x = poseX[i];
+                  pose_stamped.pose.position.y = poseY[i];
+                  pose_stamped.pose.position.z = poseZ[i];
+                  path1.header.stamp = ros::Time::now();
+                  path1.header.frame_id = "world";
+                  path1.poses.push_back(pose_stamped);
+                  //pub_path.publish(path);
+            }
+
+            for(int i = 2851; i < 5400; i++)
+            {
+
+                  geometry_msgs::PoseStamped pose_stamped;
+                  pose_stamped.header.stamp = ros::Time::now();
+                  pose_stamped.header.frame_id = "world";
+                  pose_stamped.pose.position.x = poseX[i];
+                  pose_stamped.pose.position.y = poseY[i];
+                  pose_stamped.pose.position.z = poseZ[i];
+                  path2.header.stamp = ros::Time::now();
+                  path2.header.frame_id = "world";
+                  path2.poses.push_back(pose_stamped);
+                  //pub_path.publish(path);
+            }
+
+            for(int i = 5401; i < poseX.size(); i++)
+            {
+
+                  geometry_msgs::PoseStamped pose_stamped;
+                  pose_stamped.header.stamp = ros::Time::now();
+                  pose_stamped.header.frame_id = "world";
+                  pose_stamped.pose.position.x = poseX[i];
+                  pose_stamped.pose.position.y = poseY[i];
+                  pose_stamped.pose.position.z = poseZ[i];
+                  path3.header.stamp = ros::Time::now();
+                  path3.header.frame_id = "world";
+                  path3.poses.push_back(pose_stamped);
+                  //pub_path.publish(path);
+            }
+      }
 
 
       while (ros::ok())
@@ -126,6 +210,9 @@ int main( int argc, char** argv )
                   }
 
             marker_pub.publish(image);
+            pub_path1.publish(path1);
+            pub_path2.publish(path2);
+            pub_path3.publish(path3);
             ros::spinOnce();
             r.sleep();
             

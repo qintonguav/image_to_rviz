@@ -9,6 +9,8 @@ find_package(catkin REQUIRED COMPONENTS
   visualization_msgs
   dynamic_reconfigure
   roslib
+  geometry_msgs
+  nav_msgs
 )
 find_package(OpenCV REQUIRED)
 
